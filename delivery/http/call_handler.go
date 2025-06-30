@@ -98,10 +98,45 @@ func (h *CallHandler) List(c *gin.Context) {
 		filter.EndAt = endInt
 	}
 
+	// Lấy metadata_display_field
+	metaField := c.Query("metadata_display_field")
+
 	calls, err := h.Usecase.List(filter)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, calls)
+
+	// Xây danh sách response
+	result := make([]map[string]interface{}, 0)
+	for _, call := range calls {
+		item := map[string]interface{}{
+			"id":           call.ID,
+			"phone_number": call.PhoneNumber,
+			"call_result":  call.CallResult,
+			"created_at":   call.CreatedAt,
+			"updated_at":   call.UpdatedAt,
+			"call_time":    call.CallTime,
+			"result_time":  call.ResultTime,
+			"pickup_time":  call.PickupTime,
+			"hangup_time":  call.HangupTime,
+		}
+
+		// Parse metadata
+		raw := call.Metadata
+
+		if metaField != "" {
+			if val, ok := raw[metaField]; ok {
+				item["metadata"] = map[string]interface{}{metaField: val}
+			} else {
+				item["metadata"] = map[string]interface{}{}
+			}
+		} else {
+			item["metadata"] = raw
+		}
+
+		result = append(result, item)
+	}
+
+	c.JSON(http.StatusOK, result)
 }

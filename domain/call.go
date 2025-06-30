@@ -12,16 +12,16 @@ const (
 )
 
 type CallLog struct {
-	ID          uint
-	PhoneNumber string
-	Metadata    map[string]interface{}
-	CallResult  CallResult
-	CreatedAt   int64
-	UpdatedAt   int64
-	CallTime    int64
-	ResultTime  int64
-	PickupTime  *int64
-	HangupTime  *int64
+	ID          uint                   `json:"id"`
+	PhoneNumber string                 `json:"phone_number"`
+	Metadata    map[string]interface{} `json:"metadata"`
+	CallResult  CallResult            `json:"call_result"`
+	CreatedAt   int64                 `json:"created_at"`
+	UpdatedAt   int64                 `json:"updated_at"`
+	CallTime    int64                 `json:"call_time"`
+	ResultTime  int64                 `json:"result_time"`
+	PickupTime  *int64               `json:"pickup_time"`
+	HangupTime  *int64               `json:"hangup_time"`
 }
 
 type CallFilter struct {
