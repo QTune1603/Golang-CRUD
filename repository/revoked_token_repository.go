@@ -1,4 +1,4 @@
-package model
+package repository
 
 type RevokedToken struct {
 	Token     string `gorm:"primaryKey"`

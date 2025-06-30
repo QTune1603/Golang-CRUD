@@ -1,7 +1,7 @@
 package consumer
 
 import (
-	"call-api/model"
+	"call-api/domain"
 	"call-api/repository"
 	"encoding/json"
 	"github.com/streadway/amqp"
@@ -26,18 +26,18 @@ func StartResultUpdater(conn *amqp.Connection, db *gorm.DB) {
 		log.Fatalf("Không thể lắng nghe queue: %v", err)
 	}
 
-	repo := repository.NewCallLogRepository(db)
+	repo := repository.NewCallRepository(db)
 	log.Println("Consumer cập nhật kết quả đang lắng nghe call_result_queue...")
 
 	for msg := range msgs {
-		var result model.CallLog
+		var result domain.CallLog
 		if err := json.Unmarshal(msg.Body, &result); err != nil {
 			log.Printf("Lỗi giải mã message: %v\n", err)
 			continue
 		}
 
 		// Update một số trường
-		updateData := &model.CallLog{
+		updateData := &domain.CallLog{
 			CallResult: result.CallResult,
 			ResultTime: result.ResultTime,
 			PickupTime: result.PickupTime,

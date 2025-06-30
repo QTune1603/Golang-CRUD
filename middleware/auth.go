@@ -1,7 +1,7 @@
 package middleware
 
 import (
-	"call-api/model"
+	"call-api/repository"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"gorm.io/gorm"
@@ -30,7 +30,7 @@ func JWTMiddleware(db *gorm.DB) gin.HandlerFunc {
 		}
 
 		// Check token revoked
-		var revoked model.RevokedToken
+		var revoked repository.RevokedToken
 		if err := db.Where("token = ?", tokenString).First(&revoked).Error; err == nil {
 			c.AbortWithStatusJSON(http.StatusUnauthorized, gin.H{"error": "Token revoked"})
 			return

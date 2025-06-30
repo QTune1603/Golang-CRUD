@@ -1,7 +1,7 @@
 package auth
 
 import (
-	"call-api/model"
+	"call-api/repository"
 	"call-api/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
@@ -30,7 +30,7 @@ func (h *AuthHandler) Register(c *gin.Context) {
 
 	hash, _ := bcrypt.GenerateFromPassword([]byte(input.Password), bcrypt.DefaultCost)
 
-	user := model.User{
+	user := repository.UserModel{
 		Username:  input.Username,
 		Password:  string(hash),
 		CreatedAt: time.Now().UnixMilli(),
@@ -53,7 +53,7 @@ func (h *AuthHandler) Login(c *gin.Context) {
 		return
 	}
 
-	var user model.User
+	var user repository.UserModel
 	if err := h.DB.Where("username = ?", input.Username).First(&user).Error; err != nil {
 		c.JSON(401, gin.H{"error": "Invalid credentials"})
 		return
@@ -77,7 +77,7 @@ func (h *AuthHandler) Logout(c *gin.Context) {
 	authHeader := c.GetHeader("Authorization")
 	tokenString := authHeader[len("Bearer "):]
 
-	h.DB.Create(&model.RevokedToken{
+	h.DB.Create(&repository.RevokedToken{
 		Token:     tokenString,
 		RevokedAt: time.Now().UnixMilli(),
 	})
