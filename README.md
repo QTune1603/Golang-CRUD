@@ -42,4 +42,4 @@ Golang-CRUD-main/
 │   └── reader/
 │       └── call_reader_repository.go
 
-Domain ← Usecase ← Delivery (Interface Adapter) ← Infra (Repository, Queue) ← External (DB, RabbitMQ)
+Domain ← Usecase ← Delivery (Interface Adapter) ← Infra (Repository, Queue, Middleware, Config) ← External (DB, RabbitMQ, Files, env)
