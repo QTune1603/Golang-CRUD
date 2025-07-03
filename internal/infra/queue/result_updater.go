@@ -1,4 +1,4 @@
-package consumer
+package queue
 
 import (
 	"Golang-CRUD/domain"

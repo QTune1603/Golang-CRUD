@@ -3,18 +3,22 @@ package http
 import (
 	"Golang-CRUD/domain"
 	"Golang-CRUD/usecase"
+	"Golang-CRUD/usecase/reader"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
 )
 
 type CallHandler struct {
-	Usecase *usecase.CallUsecase
+	Usecase    *usecase.CallUsecase
+	ReaderRepo reader.CallReaderRepository
 }
 
-// Constructor
-func NewCallHandler(uc *usecase.CallUsecase) *CallHandler {
-	return &CallHandler{Usecase: uc}
+func NewCallHandler(uc *usecase.CallUsecase, rr reader.CallReaderRepository) *CallHandler {
+	return &CallHandler{
+		Usecase:    uc,
+		ReaderRepo: rr,
+	}
 }
 
 // Create
@@ -98,24 +102,17 @@ func (h *CallHandler) List(c *gin.Context) {
 		filter.EndAt = endInt
 	}
 
-	// Lấy metadata_display_field
 	metaField := c.Query("metadata_display_field")
 
-	calls, err := h.Usecase.List(filter)
+	calls, err := h.ReaderRepo.GetWithMetadataField(filter, metaField)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	// Xây danh sách response
+	// Build response
 	result := make([]map[string]interface{}, 0)
 	for _, call := range calls {
-		raw := call.Metadata
-		if metaField != "" {
-			if _, ok := raw[metaField]; !ok {
-				continue 
-			}
-		}
 		item := map[string]interface{}{
 			"id":           call.ID,
 			"phone_number": call.PhoneNumber,
@@ -128,11 +125,13 @@ func (h *CallHandler) List(c *gin.Context) {
 			"hangup_time":  call.HangupTime,
 		}
 
-
+		raw := call.Metadata
 		if metaField != "" {
 			if val, ok := raw[metaField]; ok {
 				item["metadata"] = map[string]interface{}{metaField: val}
-			} 
+			} else {
+				item["metadata"] = map[string]interface{}{}
+			}
 		} else {
 			item["metadata"] = raw
 		}

@@ -2,18 +2,14 @@ package http
 
 import (
 	"Golang-CRUD/auth"
-	"Golang-CRUD/usecase"
 	"Golang-CRUD/internal/middleware"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 )
 
-func InitRouter(callUC *usecase.CallUsecase, userUC *usecase.UserUsecase, authHandler *auth.AuthHandler, db *gorm.DB) *gin.Engine {
+func InitRouter(callHandler *CallHandler, userHandler *UserHandler, authHandler *auth.AuthHandler, db *gorm.DB) *gin.Engine {
 	r := gin.Default()
 	r.Use(middleware.CORSMiddleware())
-
-	callHandler := NewCallHandler(callUC)
-	userHandler := NewUserHandler(userUC)
 
 	// Public routes
 	r.POST("/register", authHandler.Register)

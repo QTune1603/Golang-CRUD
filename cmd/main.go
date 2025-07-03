@@ -3,11 +3,10 @@ package main
 import (
 	"Golang-CRUD/auth"
 	"Golang-CRUD/internal/config"
+	"Golang-CRUD/internal/infra/repository"
 	"Golang-CRUD/internal/infra/queue"
 	httpDelivery "Golang-CRUD/delivery/http"
-	"Golang-CRUD/internal/infra/repository"
 	"Golang-CRUD/usecase"
-
 )
 
 func main() {
@@ -20,21 +19,26 @@ func main() {
 	defer rabbitConn.Close()
 
 	// Consumer chạy nền
-	go consumer.StartResultUpdater(rabbitConn, db)
+	go queue.StartResultUpdater(rabbitConn, db)
 
-	// Init repository
+	// Init repositories
 	callRepo := repository.NewCallRepository(db)
 	userRepo := repository.NewUserRepository(db)
+	readerRepo := repository.NewCallReaderRepository(db)
 
-	// Init usecase
+	// Init usecases
 	callUC := usecase.NewCallUsecase(callRepo)
 	userUC := usecase.NewUserUsecase(userRepo)
 
-	// Init auth handler (vẫn giữ)
+	// Init auth handler
 	authHandler := auth.NewAuthHandler(db)
 
+	// Init handlers
+	callHandler := httpDelivery.NewCallHandler(callUC, readerRepo)
+	userHandler := httpDelivery.NewUserHandler(userUC)
+
 	// Init router từ file route.go
-	router := httpDelivery.InitRouter(callUC, userUC, authHandler, db)
+	router := httpDelivery.InitRouter(callHandler, userHandler, authHandler, db)
 
 	// Run server
 	router.Run(":8080")
