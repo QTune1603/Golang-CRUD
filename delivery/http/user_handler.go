@@ -1,8 +1,8 @@
 package http
 
 import (
-	"call-api/domain"
-	"call-api/usecase"
+	"Golang-CRUD/domain"
+	"Golang-CRUD/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
 )

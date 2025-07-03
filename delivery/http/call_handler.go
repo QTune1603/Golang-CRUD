@@ -1,8 +1,8 @@
 package http
 
 import (
-	"call-api/domain"
-	"call-api/usecase"
+	"Golang-CRUD/domain"
+	"Golang-CRUD/usecase"
 	"github.com/gin-gonic/gin"
 	"net/http"
 	"strconv"
@@ -110,6 +110,12 @@ func (h *CallHandler) List(c *gin.Context) {
 	// Xây danh sách response
 	result := make([]map[string]interface{}, 0)
 	for _, call := range calls {
+		raw := call.Metadata
+		if metaField != "" {
+			if _, ok := raw[metaField]; !ok {
+				continue 
+			}
+		}
 		item := map[string]interface{}{
 			"id":           call.ID,
 			"phone_number": call.PhoneNumber,
@@ -122,15 +128,11 @@ func (h *CallHandler) List(c *gin.Context) {
 			"hangup_time":  call.HangupTime,
 		}
 
-		// Parse metadata
-		raw := call.Metadata
 
 		if metaField != "" {
 			if val, ok := raw[metaField]; ok {
 				item["metadata"] = map[string]interface{}{metaField: val}
-			} else {
-				item["metadata"] = map[string]interface{}{}
-			}
+			} 
 		} else {
 			item["metadata"] = raw
 		}

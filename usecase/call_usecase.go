@@ -1,6 +1,6 @@
 package usecase
 
-import "call-api/domain"
+import "Golang-CRUD/domain"
 
 type CallUsecase struct {
 	Repo domain.CallRepository

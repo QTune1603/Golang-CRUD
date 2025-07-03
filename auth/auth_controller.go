@@ -1,8 +1,8 @@
 package auth
 
 import (
-	"call-api/repository"
-	"call-api/middleware"
+	"Golang-CRUD/internal/infra/repository"
+	"Golang-CRUD/internal/middleware"
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v5"
 	"golang.org/x/crypto/bcrypt"
